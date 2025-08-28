@@ -12,6 +12,13 @@ export default function Login() {
   const [isParent, setIsParent] = useState(true)
   const [familyCode, setFamilyCode] = useState('')
   const [message, setMessage] = useState('')
+  const [toast, setToast] = useState({ show: false, text: '', type: 'success' })
+
+  const showToast = (text, type = 'success', timeout = 5000) => {
+    setToast({ show: true, text, type })
+    window.clearTimeout(showToast._t)
+    showToast._t = window.setTimeout(() => setToast((t) => ({ ...t, show: false })), timeout)
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -51,14 +58,35 @@ export default function Login() {
 
         if (userError) throw userError
         setMessage('Регистрация успешна! Проверьте email для подтверждения.')
+        showToast('Мы отправили вам письмо с подтверждением. Проверьте вашу почту.')
       }
     } catch (error) {
       setMessage(`Ошибка: ${error.message}`)
+      showToast(`Ошибка: ${error.message}`, 'error')
     }
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-minecraft-blue to-minecraft-green flex items-center justify-center p-4" style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'linear-gradient(to bottom, #3498DB, #4CAF50)' }}>
+      {toast.show && (
+        <div
+          className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded text-white shadow-lg"
+          style={{
+            position: 'fixed',
+            top: 16,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 9999,
+            padding: '10px 14px',
+            borderRadius: 8,
+            color: '#fff',
+            background: toast.type === 'success' ? '#16a34a' : '#dc2626',
+            boxShadow: '0 8px 20px rgba(0,0,0,0.15)'
+          }}
+        >
+          {toast.text}
+        </div>
+      )}
       <motion.div 
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
