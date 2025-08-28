@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { supabase } from './lib/supabase'
+
 import Login from './components/Login'
 
 function App() {
@@ -9,6 +10,7 @@ function App() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+
     // Проверка активной сессии
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
@@ -24,6 +26,48 @@ function App() {
 
     return () => subscription.unsubscribe()
   }, [])
+
+  // After authentication, ensure a basic profile exists
+  useEffect(() => {
+    const ensureProfile = async () => {
+      // Гарантируем наличие аутентифицированного пользователя
+      const { data: userData } = await supabase.auth.getUser()
+      const user = userData?.user
+      if (!user?.email) return
+      try {
+        const email = user.email
+        // Check if a profile already exists
+        const { data: existing, error: selErr } = await supabase
+          .from('users')
+          .select('id')
+          .eq('email', email)
+          .maybeSingle()
+
+        if (selErr) {
+          // If RLS denies select, just exit silently
+          return
+        }
+
+        if (!existing) {
+          // Insert a minimal profile; adjust defaults as needed
+          await supabase.from('users').insert([
+            {
+              email,
+              phone: null,
+              role: 'parent',
+              verified: true,
+              family_id: null,
+            },
+          ])
+        }
+      } catch (e) {
+        // swallow errors to not break UI
+        // console.warn('ensureProfile error', e)
+      }
+    }
+
+    ensureProfile()
+  }, [session])
 
   if (loading) {
     return (

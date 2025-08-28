@@ -2,10 +2,19 @@ import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import react from 'eslint-plugin-react'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
   globalIgnores(['dist']),
+  // Node context overrides for config files
+  {
+    files: ['**/*.{cjs,js}'],
+    ignores: [],
+    languageOptions: {
+      globals: { ...globals.node },
+    },
+  },
   {
     files: ['**/*.{js,jsx}'],
     extends: [
@@ -13,6 +22,9 @@ export default defineConfig([
       reactHooks.configs['recommended-latest'],
       reactRefresh.configs.vite,
     ],
+    plugins: {
+      react,
+    },
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -24,6 +36,8 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'react/jsx-uses-vars': 'error',
+      'react/jsx-uses-react': 'off',
     },
   },
 ])

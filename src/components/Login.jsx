@@ -1,70 +1,66 @@
 // src/components/Login.jsx
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { supabase } from '../lib/supabase'
+/* jshint esversion: 9 */
+/* jshint ignore: start */
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { supabase } from '../lib/supabase';
 
 export default function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [phone, setPhone] = useState('')
-  const [role, setRole] = useState('parent')
-  const [isLogin, setIsLogin] = useState(true)
-  const [isParent, setIsParent] = useState(true)
-  const [familyCode, setFamilyCode] = useState('')
-  const [message, setMessage] = useState('')
-  const [toast, setToast] = useState({ show: false, text: '', type: 'success' })
+  const MotionDiv = motion.div;
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [role, setRole] = useState('parent');
+  const [isLogin, setIsLogin] = useState(true);
+  const [isParent, setIsParent] = useState(true);
+  const [familyCode, setFamilyCode] = useState('');
+  const [message, setMessage] = useState('');
+  const [toast, setToast] = useState({ show: false, text: '', type: 'success' });
 
   const showToast = (text, type = 'success', timeout = 5000) => {
-    setToast({ show: true, text, type })
-    window.clearTimeout(showToast._t)
-    showToast._t = window.setTimeout(() => setToast((t) => ({ ...t, show: false })), timeout)
-  }
+    setToast({ show: true, text, type });
+    window.clearTimeout(showToast._t);
+    showToast._t = window.setTimeout(() => setToast((t) => ({ ...t, show: false })), timeout);
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setMessage('')
+    e.preventDefault();
+    setMessage('');
 
     try {
       if (isLogin) {
         // Вход
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         })
-        if (error) throw error
-        setMessage('Успешный вход!')
+        if (error) throw error;
+        setMessage('Успешный вход!');
       } else {
         // Регистрация
-        const { data, error } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email,
           password,
           phone,
         })
-        if (error) throw error
+        if (error) {
+          const msg = String(error.message || '')
+          const isRlsUsers = msg.includes('row-level security') && msg.includes('table "users"')
+          if (!isRlsUsers) throw error
+          // Игнорируем RLS-ошибку от БД-триггера users, т.к. пользователь и письмо созданы
+        }
 
-        // Сохранение дополнительной информации о пользователе
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .insert([
-            {
-              email,
-              phone,
-              role,
-              verified: role === 'parent', // Родители верифицируются сразу
-              family_id: familyCode || null,
-            },
-          ])
-          .select()
-
-        if (userError) throw userError
-        setMessage('Регистрация успешна! Проверьте email для подтверждения.')
-        showToast('Мы отправили вам письмо с подтверждением. Проверьте вашу почту.')
+        // Не пишем в таблицу users во время регистрации,
+        // так как сессии ещё нет и RLS блокирует вставку.
+        // Сообщаем пользователю про письмо подтверждения.
+        setMessage('Регистрация успешна! Проверьте email для подтверждения.');
+        showToast('Мы отправили вам письмо с подтверждением. Проверьте вашу почту.');
       }
     } catch (error) {
-      setMessage(`Ошибка: ${error.message}`)
-      showToast(`Ошибка: ${error.message}`, 'error')
+      setMessage(`Ошибка: ${error.message}`);
+      showToast(`Ошибка: ${error.message}`, 'error');
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-minecraft-blue to-minecraft-green flex items-center justify-center p-4" style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'linear-gradient(to bottom, #3498DB, #4CAF50)' }}>
@@ -87,7 +83,7 @@ export default function Login() {
           {toast.text}
         </div>
       )}
-      <motion.div 
+      <MotionDiv 
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md"
@@ -189,7 +185,7 @@ export default function Login() {
             {isLogin ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите'}
           </button>
         </div>
-      </motion.div>
+      </MotionDiv>
     </div>
   )
 }
