@@ -30,7 +30,8 @@ body {
 :root{
   --bg1: #87CEEB;
   --bg2: #b7e0ff;
-  --p: 14px;                 /* немного больше для лучшей видимости */
+  --p-base: 14px;            /* базовый размер "пикселя" */
+  --p: var(--p-base);        /* актуальный размер, переопределяется для разных облаков */
   --cloud: #ffffff;          /* цвет облака */
   --cloud-shadow: #e6f0ff;   /* лёгкая тень/контур (опционально) */
 }
@@ -49,6 +50,8 @@ html, body{
   overflow:hidden;
   z-index: 1; /* поверх градиента, но ниже контента */
   pointer-events: none;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 /* базовый "пиксель" */
@@ -65,24 +68,26 @@ html, body{
 
 /* форма облака через box-shadow */
 .pixel.cloud {
+  /* Небольшой спред, чтобы квадраты слегка перекрывались и не образовывали "сетку" на зумах */
+  --sp: 0.35px;
   box-shadow:
     /* верхний ряд */
-    calc(var(--p) * 1) 0 0 0 var(--cloud),
-    calc(var(--p) * 2) 0 0 0 var(--cloud),
+    calc(var(--p) * 1) 0 0 var(--sp) var(--cloud),
+    calc(var(--p) * 2) 0 0 var(--sp) var(--cloud),
 
     /* второй ряд */
-    calc(var(--p) * -1) calc(var(--p) * 1) 0 0 var(--cloud),
-    0                       calc(var(--p) * 1) 0 0 var(--cloud),
-    calc(var(--p) * 1)  calc(var(--p) * 1) 0 0 var(--cloud),
-    calc(var(--p) * 2)  calc(var(--p) * 1) 0 0 var(--cloud),
-    calc(var(--p) * 3)  calc(var(--p) * 1) 0 0 var(--cloud),
+    calc(var(--p) * -1) calc(var(--p) * 1) 0 var(--sp) var(--cloud),
+    0                       calc(var(--p) * 1) 0 var(--sp) var(--cloud),
+    calc(var(--p) * 1)  calc(var(--p) * 1) 0 var(--sp) var(--cloud),
+    calc(var(--p) * 2)  calc(var(--p) * 1) 0 var(--sp) var(--cloud),
+    calc(var(--p) * 3)  calc(var(--p) * 1) 0 var(--sp) var(--cloud),
 
     /* третий ряд */
-    calc(var(--p) * -2) calc(var(--p) * 2) 0 0 var(--cloud),
-    calc(var(--p) * -1) calc(var(--p) * 2) 0 0 var(--cloud),
-    0                       calc(var(--p) * 2) 0 0 var(--cloud),
-    calc(var(--p) * 1)  calc(var(--p) * 2) 0 0 var(--cloud),
-    calc(var(--p) * 2)  calc(var(--p) * 2) 0 0 var(--cloud);
+    calc(var(--p) * -2) calc(var(--p) * 2) 0 var(--sp) var(--cloud),
+    calc(var(--p) * -1) calc(var(--p) * 2) 0 var(--sp) var(--cloud),
+    0                       calc(var(--p) * 2) 0 var(--sp) var(--cloud),
+    calc(var(--p) * 1)  calc(var(--p) * 2) 0 var(--sp) var(--cloud),
+    calc(var(--p) * 2)  calc(var(--p) * 2) 0 var(--sp) var(--cloud);
 
   /* мягкий общий контур + лёгкая тень вниз */
   filter:
@@ -92,29 +97,29 @@ html, body{
 
 /* масштабирование/анимации */
 .cloud {
-  transform: scale(var(--size, 1)) translateX(0);
+  transform: translateX(0);
   left: var(--left, 10%);
   top: var(--top, 20%);
   animation:
     drift var(--drift-time, 30s) linear infinite,
-    bob calc(4s / var(--size,1)) ease-in-out infinite;
+    bob var(--bob-time, 4s) ease-in-out infinite;
   opacity: 0.98;
 }
 
-.cloud.small  { --size: 1.2;  --drift-time: 22s; }
-.cloud.medium { --size: 1.8;  --drift-time: 35s; }
-.cloud.large  { --size: 2.6;  --drift-time: 50s; }
+.cloud.small  { --p: 12px; --drift-time: 22s; --bob-time: 4s; }
+.cloud.medium { --p: 16px; --drift-time: 35s; --bob-time: 5s; }
+.cloud.large  { --p: 20px; --drift-time: 50s; --bob-time: 6s; }
 
 @keyframes drift{
-  0%   { transform: scale(var(--size,1)) translateX(-8vw); }
-  50%  { transform: scale(var(--size,1)) translateX(8vw); }
-  100% { transform: scale(var(--size,1)) translateX(-8vw); }
+  0%   { transform: translateX(-8vw); }
+  50%  { transform: translateX(8vw); }
+  100% { transform: translateX(-8vw); }
 }
 
 @keyframes bob{
-  0%   { transform: scale(var(--size,1)) translateY(0) translateX(0); }
-  50%  { transform: scale(var(--size,1)) translateY(-6px) translateX(0); }
-  100% { transform: scale(var(--size,1)) translateY(0) translateX(0); }
+  0%   { transform: translateY(0) translateX(0); }
+  50%  { transform: translateY(-6px) translateX(0); }
+  100% { transform: translateY(0) translateX(0); }
 }
 
 .horizon{
@@ -128,5 +133,5 @@ html, body{
 }
 
 @media (max-width:420px){
-  :root { --p: 10px; }
+  :root { --p-base: 12px; }
 }
