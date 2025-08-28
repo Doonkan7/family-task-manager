@@ -58,13 +58,14 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-minecraft.blue to-minecraft.green flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-minecraft-blue to-minecraft-green flex items-center justify-center p-4" style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'linear-gradient(to bottom, #3498DB, #4CAF50)' }}>
       <motion.div 
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md"
+        style={{ maxWidth: 420, width: '100%', background: '#ffffff', padding: 24, borderRadius: 12, boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
       >
-        <h2 className="text-2xl font-pixel text-center mb-6 text-minecraft.green">
+        <h2 className="text-2xl font-pixel text-center mb-6 text-minecraft-green" style={{ fontFamily: '"Press Start 2P", "Courier New", monospace' }}>
           {isLogin ? 'Вход' : 'Регистрация'}
         </h2>
         
@@ -140,7 +141,7 @@ export default function Login() {
           
           <button
             type="submit"
-            className="w-full bg-minecraft.green text-white py-2 rounded font-pixel hover:bg-green-600 transition"
+            className="w-full bg-minecraft-green text-white py-2 rounded font-pixel hover:bg-green-600 transition"
           >
             {isLogin ? 'Войти' : 'Зарегистрироваться'}
           </button>
@@ -155,7 +156,7 @@ export default function Login() {
         <div className="mt-4 text-center">
           <button
             onClick={() => setIsLogin(!isLogin)}
-            className="text-minecraft.blue hover:underline"
+            className="text-minecraft-blue hover:underline"
           >
             {isLogin ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите'}
           </button>

@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="ru">
   <head>
+
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,7 +10,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+      /* Critical CSS to avoid FOUC */
+      html, body, #root { height: 100%; }
+      body { margin: 0; background: linear-gradient(to bottom, #3498DB, #4CAF50); }
+      .font-pixel { font-family: "Press Start 2P", "Courier New", monospace; }
+    </style>
   </head>
+
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>

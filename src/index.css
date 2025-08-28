@@ -7,6 +7,11 @@
   background: linear-gradient(to bottom, #3498DB, #4CAF50);
 }
 
+/* Фоллбек для шрифта пиксельного стиля, если Tailwind класс font-pixel не сработал */
+.font-pixel {
+  font-family: "Press Start 2P", "Courier New", monospace;
+}
+
 body {
   margin: 0;
   padding: 0;
