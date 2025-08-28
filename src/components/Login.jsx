@@ -63,7 +63,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-minecraft-blue to-minecraft-green flex items-center justify-center p-4" style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'linear-gradient(to bottom, #3498DB, #4CAF50)' }}>
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'transparent' }}>
       {toast.show && (
         <div
           className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded text-white shadow-lg"

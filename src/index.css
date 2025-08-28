@@ -1,6 +1,8 @@
+/* stylelint-disable at-rule-no-unknown */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* stylelint-enable at-rule-no-unknown */
 
 /* Кастомные стили для тестирования */
 .test-minecraft-colors {
@@ -22,4 +24,109 @@ body {
 #root {
   width: 100%;
   min-height: 100vh;
+}
+
+/* === Pixel Cloud Sky Background === */
+:root{
+  --bg1: #87CEEB;
+  --bg2: #b7e0ff;
+  --p: 14px;                 /* немного больше для лучшей видимости */
+  --cloud: #ffffff;          /* цвет облака */
+  --cloud-shadow: #e6f0ff;   /* лёгкая тень/контур (опционально) */
+}
+
+html, body{
+  height:100%;
+  background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+}
+
+/* Контейнер неба фиксируем позади контента */
+.sky{
+  position: fixed;
+  inset: 0;
+  width:100%;
+  height:100vh;
+  overflow:hidden;
+  z-index: 1; /* поверх градиента, но ниже контента */
+  pointer-events: none;
+}
+
+/* базовый "пиксель" */
+.pixel {
+  position:absolute;
+  width:var(--p);
+  height:var(--p);
+  background:var(--cloud);
+  image-rendering: crisp-edges;
+  will-change: transform;
+  transform-origin: left top;
+  border-radius: 0;
+}
+
+/* форма облака через box-shadow */
+.pixel.cloud {
+  box-shadow:
+    /* верхний ряд */
+    calc(var(--p) * 1) 0 0 0 var(--cloud),
+    calc(var(--p) * 2) 0 0 0 var(--cloud),
+
+    /* второй ряд */
+    calc(var(--p) * -1) calc(var(--p) * 1) 0 0 var(--cloud),
+    0                       calc(var(--p) * 1) 0 0 var(--cloud),
+    calc(var(--p) * 1)  calc(var(--p) * 1) 0 0 var(--cloud),
+    calc(var(--p) * 2)  calc(var(--p) * 1) 0 0 var(--cloud),
+    calc(var(--p) * 3)  calc(var(--p) * 1) 0 0 var(--cloud),
+
+    /* третий ряд */
+    calc(var(--p) * -2) calc(var(--p) * 2) 0 0 var(--cloud),
+    calc(var(--p) * -1) calc(var(--p) * 2) 0 0 var(--cloud),
+    0                       calc(var(--p) * 2) 0 0 var(--cloud),
+    calc(var(--p) * 1)  calc(var(--p) * 2) 0 0 var(--cloud),
+    calc(var(--p) * 2)  calc(var(--p) * 2) 0 0 var(--cloud);
+
+  /* мягкий общий контур + лёгкая тень вниз */
+  filter:
+    drop-shadow(0 0 3px rgba(0,0,0,0.10))
+    drop-shadow(0 8px 10px rgba(0,0,0,0.12));
+}
+
+/* масштабирование/анимации */
+.cloud {
+  transform: scale(var(--size, 1)) translateX(0);
+  left: var(--left, 10%);
+  top: var(--top, 20%);
+  animation:
+    drift var(--drift-time, 30s) linear infinite,
+    bob calc(4s / var(--size,1)) ease-in-out infinite;
+  opacity: 0.98;
+}
+
+.cloud.small  { --size: 1.2;  --drift-time: 22s; }
+.cloud.medium { --size: 1.8;  --drift-time: 35s; }
+.cloud.large  { --size: 2.6;  --drift-time: 50s; }
+
+@keyframes drift{
+  0%   { transform: scale(var(--size,1)) translateX(-8vw); }
+  50%  { transform: scale(var(--size,1)) translateX(8vw); }
+  100% { transform: scale(var(--size,1)) translateX(-8vw); }
+}
+
+@keyframes bob{
+  0%   { transform: scale(var(--size,1)) translateY(0) translateX(0); }
+  50%  { transform: scale(var(--size,1)) translateY(-6px) translateX(0); }
+  100% { transform: scale(var(--size,1)) translateY(0) translateX(0); }
+}
+
+.horizon{
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  height:8vh;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.05));
+  pointer-events:none;
+}
+
+@media (max-width:420px){
+  :root { --p: 10px; }
 }

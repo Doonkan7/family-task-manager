@@ -1,9 +1,12 @@
-// src/App.jsx
+/* Файл: src/App.jsx */
+/* jshint esversion: 9 */
+/* jshint ignore: start */
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { supabase } from './lib/supabase'
 
 import Login from './components/Login'
+import Sky from './components/Sky'
 
 function App() {
   const [session, setSession] = useState(null)
@@ -27,7 +30,7 @@ function App() {
     return () => subscription.unsubscribe()
   }, [])
 
-  // After authentication, ensure a basic profile exists
+  // После аутентификации гарантируем наличие базового профиля
   useEffect(() => {
     const ensureProfile = async () => {
       // Гарантируем наличие аутентифицированного пользователя
@@ -36,7 +39,7 @@ function App() {
       if (!user?.email) return
       try {
         const email = user.email
-        // Check if a profile already exists
+        // Проверяем, существует ли профиль пользователя
         const { data: existing, error: selErr } = await supabase
           .from('users')
           .select('id')
@@ -49,7 +52,7 @@ function App() {
         }
 
         if (!existing) {
-          // Insert a minimal profile; adjust defaults as needed
+          // Вставляем минимальный профиль; при необходимости можно изменить значения по умолчанию
           await supabase.from('users').insert([
             {
               email,
@@ -61,8 +64,8 @@ function App() {
           ])
         }
       } catch (e) {
-        // swallow errors to not break UI
-        // console.warn('ensureProfile error', e)
+        // Не ломаем UI; логируем ошибку для отладки
+        console.warn('ensureProfile error', e)
       }
     }
 
@@ -71,52 +74,67 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-8" style={{ backgroundColor: '#f3f4f6' }}>
-        <div className="rounded-2xl shadow-2xl p-12 max-w-2xl w-full mx-auto" style={{
+      <>
+        <Sky />
+        <div className="min-h-screen flex items-center justify-center p-8 relative z-10">
+          <div className="rounded-2xl shadow-2xl p-12 max-w-2xl w-full mx-auto" style={{
+            background: 'linear-gradient(to bottom, #3498DB, #4CAF50)'
+          }}>
+            <motion.h1 
+              className="text-2xl sm:text-3xl lg:text-4xl text-white text-center"
+              style={{
+                fontFamily: '"Press Start 2P", "Courier New", monospace',
+                textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                lineHeight: '1.5'
+              }}
+              initial={{ opacity: 0, y: -30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              Загрузка...
+            </motion.h1>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  if (!session) {
+    return (
+      <>
+        <Sky />
+        <div className="min-h-screen flex items-center justify-center p-8 relative z-10">
+          <div className="w-full">
+            <Login />
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  return (
+    <>
+      <Sky />
+      <div className="min-h-screen flex items-center justify-center p-8 relative z-10">
+        <div className="rounded-2xl shadow-2xl p-12 max-w-4xl w-full mx-auto" style={{
           background: 'linear-gradient(to bottom, #3498DB, #4CAF50)'
         }}>
           <motion.h1 
-            className="text-2xl sm:text-3xl lg:text-4xl text-white text-center"
+            className="text-xl sm:text-2xl lg:text-3xl text-white text-center"
             style={{
               fontFamily: '"Press Start 2P", "Courier New", monospace',
               textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-              lineHeight: '1.5'
+              lineHeight: '1.6'
             }}
             initial={{ opacity: 0, y: -30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            Загрузка...
+            Добро пожаловать в Family Task Manager!
           </motion.h1>
         </div>
       </div>
-    )
-  }
-
-  if (!session) {
-    return <Login />
-  }
-
-  return (
-    <div className="min-h-screen flex items-center justify-center p-8" style={{ backgroundColor: '#f3f4f6' }}>
-      <div className="rounded-2xl shadow-2xl p-12 max-w-4xl w-full mx-auto" style={{
-        background: 'linear-gradient(to bottom, #3498DB, #4CAF50)'
-      }}>
-        <motion.h1 
-          className="text-xl sm:text-2xl lg:text-3xl text-white text-center"
-          style={{
-            fontFamily: '"Press Start 2P", "Courier New", monospace',
-            textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-            lineHeight: '1.6'
-          }}
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          Добро пожаловать в Family Task Manager!
-        </motion.h1>
-      </div>
-    </div>
+    </>
   )
 }
 
