@@ -1,4 +1,3 @@
-// src/components/Login.jsx
 /* jshint esversion: 9 */
 /* jshint ignore: start */
 import { useState } from 'react';
@@ -15,6 +14,7 @@ export default function Login() {
   const [isParent, setIsParent] = useState(true);
   const [familyCode, setFamilyCode] = useState('');
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ show: false, text: '', type: 'success' });
 
   const showToast = (text, type = 'success', timeout = 5000) => {
@@ -26,6 +26,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
+    setLoading(true);
 
     try {
       if (isLogin) {
@@ -38,27 +39,94 @@ export default function Login() {
         setMessage('Успешный вход!');
       } else {
         // Регистрация
-        const { error } = await supabase.auth.signUp({
+        // 1) Сначала регистрируем пользователя в Auth БЕЗ дополнительных данных (чтобы избежать DB errors от триггеров/RLS)
+        const { data: authData, error: authError } = await supabase.auth.signUp({
           email,
           password,
-          phone,
         })
-        if (error) {
-          const msg = String(error.message || '')
-          const isRlsUsers = msg.includes('row-level security') && msg.includes('table "users"')
-          if (!isRlsUsers) throw error
-          // Игнорируем RLS-ошибку от БД-триггера users, т.к. пользователь и письмо созданы
+
+        if (authError) throw authError
+
+        // 2) Проверяем, активна ли сессия сразу (если подтверждение email отключено)
+        const { data: sessionData } = await supabase.auth.getSession()
+        const hasSession = !!sessionData?.session
+
+        if (!hasSession) {
+          // Нет активной сессии: дальнейшие операции с БД невозможны (RLS). Сообщим пользователю и завершим.
+          setMessage(
+            'Регистрация успешна! Проверьте email для подтверждения. ' +
+              (familyCode
+                ? 'После входа мы автоматически попытаемся присоединить вас к семье по указанному коду.'
+                : 'После входа мы создадим для вас новую семью (или сможете выбрать в профиле).')
+          )
+          showToast('Мы отправили вам письмо с подтверждением. Проверьте вашу почту.')
+          return
         }
 
-        // Не пишем в таблицу users во время регистрации,
-        // так как сессии ещё нет и RLS блокирует вставку.
-        // Сообщаем пользователю про письмо подтверждения.
-        setMessage('Регистрация успешна! Проверьте email для подтверждения.');
-        showToast('Мы отправили вам письмо с подтверждением. Проверьте вашу почту.');
+        // 3) Есть сессия: обновляем метаданные пользователя (role, requested_family_code, phone)
+        const { error: metaErr } = await supabase.auth.updateUser({
+          data: {
+            role,
+            requested_family_code: familyCode || null,
+            phone: phone || null,
+          },
+        })
+        if (metaErr) throw metaErr
+
+        // 4) Создаем/проверяем семью и обновляем метаданные пользователя с family_id
+        let familyIdToUse = familyCode || null
+        let shouldCreateFamily = !familyCode
+
+        // Если указан код семьи, проверяем его существование
+        if (familyCode) {
+          const { data: familyData, error: familyError } = await supabase
+            .from('families')
+            .select('family_id')
+            .eq('family_id', familyCode)
+            .single()
+
+          if (familyError && familyError.code !== 'PGRST116') {
+            throw familyError
+          }
+
+          if (!familyData) {
+            shouldCreateFamily = true
+          }
+        }
+
+        // Если нужно создать семью
+        if (shouldCreateFamily) {
+          const { data: newFamily, error: newFamilyError } = await supabase
+            .from('families')
+            .insert([{ family_name: `Семья ${email.split('@')[0]}` }])
+            .select()
+            .single()
+
+          if (newFamilyError) throw newFamilyError
+          familyIdToUse = newFamily.family_id
+        }
+
+        // Обновляем метаданные пользователя с family_id
+        const { error: updateError } = await supabase.auth.updateUser({
+          data: {
+            role,
+            family_id: familyIdToUse,
+          },
+        })
+
+        if (updateError) throw updateError
+
+        setMessage(
+          `Регистрация успешна! Ваш код семьи: ${familyIdToUse}. Проверьте email для подтверждения.`
+        )
+        showToast('Мы отправили вам письмо с подтверждением. Проверьте вашу почту.')
       }
     } catch (error) {
       setMessage(`Ошибка: ${error.message}`);
       showToast(`Ошибка: ${error.message}`, 'error');
+      console.error('Ошибка регистрации:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -102,6 +170,7 @@ export default function Login() {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded"
               required
+              disabled={loading}
             />
           </div>
           
@@ -113,6 +182,7 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded"
               required
+              disabled={loading}
             />
           </div>
           
@@ -125,6 +195,7 @@ export default function Login() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded"
+                  disabled={loading}
                 />
               </div>
               
@@ -137,6 +208,7 @@ export default function Login() {
                     setIsParent(e.target.value === 'parent')
                   }}
                   className="w-full p-2 border border-gray-300 rounded"
+                  disabled={loading}
                 >
                   <option value="parent">Родитель</option>
                   <option value="child">Ребенок</option>
@@ -148,26 +220,29 @@ export default function Login() {
                 </select>
               </div>
               
-              {!isParent && (
-                <div>
-                  <label className="block text-sm font-medium mb-1">Код семьи</label>
-                  <input
-                    type="text"
-                    value={familyCode}
-                    onChange={(e) => setFamilyCode(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded"
-                    placeholder="Введите код вашей семьи"
-                  />
-                </div>
-              )}
+              <div>
+                <label className="block text-sm font-medium mb-1">Код семьи (опционально)</label>
+                <input
+                  type="text"
+                  value={familyCode}
+                  onChange={(e) => setFamilyCode(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded"
+                  placeholder="Код семьи или оставьте пустым"
+                  disabled={loading}
+                />
+                <p className="text-sm text-gray-600 mt-1">
+                  Если вы первый в семье, оставьте поле пустым. Если кто-то уже зарегистрирован, попросите код семьи.
+                </p>
+              </div>
             </>
           )}
           
           <button
             type="submit"
-            className="w-full bg-minecraft-green text-white py-2 rounded font-pixel hover:bg-green-600 transition"
+            className="w-full bg-minecraft-green text-white py-2 rounded font-pixel hover:bg-green-600 transition disabled:opacity-50"
+            disabled={loading}
           >
-            {isLogin ? 'Войти' : 'Зарегистрироваться'}
+            {loading ? 'Загрузка...' : (isLogin ? 'Войти' : 'Зарегистрироваться')}
           </button>
         </form>
         
@@ -181,6 +256,7 @@ export default function Login() {
           <button
             onClick={() => setIsLogin(!isLogin)}
             className="text-minecraft-blue hover:underline"
+            disabled={loading}
           >
             {isLogin ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите'}
           </button>
