@@ -7,12 +7,12 @@ import { AuthHelpers, TaskHelpers, WaitHelpers, FileHelpers } from './utils/help
 
 test.describe('Управление задачами', () => {
   let authHelpers
-  let taskHelpers
+  let _taskHelpers
   let waitHelpers
 
   test.beforeEach(async ({ page }) => {
     authHelpers = new AuthHelpers(page)
-    taskHelpers = new TaskHelpers(page)
+    _taskHelpers = new TaskHelpers(page)
     waitHelpers = new WaitHelpers(page)
   })
 

@@ -3,7 +3,7 @@
  */
 
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
-import { screen, fireEvent, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { renderWithProviders, createSupabaseMock, mockUser, mockChild, mockTask, createMockFile } from '../utils'
 import App from '../../App'
@@ -350,7 +350,7 @@ describe('Интеграционные тесты пользовательски
         if (table === 'users') {
           return {
             select: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockImplementation((field, value) => {
+            eq: vi.fn().mockImplementation(() => {
               if (field === 'id') {
                 return {
                   single: vi.fn().mockResolvedValue({
@@ -487,7 +487,7 @@ describe('Интеграционные тесты пользовательски
         if (table === 'users') {
           return {
             select: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockImplementation((field, value) => {
+            eq: vi.fn().mockImplementation(() => {
               if (field === 'id') {
                 return {
                   single: vi.fn().mockResolvedValue({
@@ -607,7 +607,7 @@ describe('Интеграционные тесты пользовательски
       })
 
       // Проверяем успешное уведомление
-      expect(global.alert).toHaveBeenCalledWith('Задача успешно создана!')
+      expect(globalThis.alert).toHaveBeenCalledWith('Задача успешно создана!')
     })
   })
 
@@ -701,7 +701,7 @@ describe('Интеграционные тесты пользовательски
 
       // Проверяем, что семья была создана
       expect(supabase.from).toHaveBeenCalledWith('families')
-      expect(global.alert).toHaveBeenCalledWith('Новая семья создана! Ваш код семьи: family-123')
+      expect(globalThis.alert).toHaveBeenCalledWith('Новая семья создана! Ваш код семьи: family-123')
     })
   })
 

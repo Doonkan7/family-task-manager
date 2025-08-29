@@ -2,7 +2,7 @@
  * Переиспользуемые утилиты для упрощения тестирования
  */
 
-import { expect } from '@playwright/test'
+// import { expect } from '@playwright/test' // временно не используется
 import path from 'path'
 
 /**

@@ -3,7 +3,7 @@
  */
 
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
-import { screen, fireEvent, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { renderWithProviders, createSupabaseMock, mockUser, mockChild, mockTask } from '../../test/utils'
 import ParentDashboard from '../ParentDashboard'
@@ -81,7 +81,7 @@ describe('Компонент ParentDashboard', () => {
         if (table === 'users') {
           return {
             select: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockImplementation((field, value) => {
+            eq: vi.fn().mockImplementation(() => {
               if (field === 'id') {
                 return {
                   single: vi.fn().mockResolvedValue({
@@ -140,7 +140,7 @@ describe('Компонент ParentDashboard', () => {
         if (table === 'users') {
           return {
             select: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockImplementation((field, value) => {
+            eq: vi.fn().mockImplementation(() => {
               if (field === 'id') {
                 return {
                   single: vi.fn().mockResolvedValue({
@@ -231,7 +231,7 @@ describe('Компонент ParentDashboard', () => {
         if (table === 'users') {
           return {
             select: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockImplementation((field, value) => {
+            eq: vi.fn().mockImplementation(() => {
               if (field === 'id') {
                 return {
                   single: vi.fn().mockResolvedValue({
@@ -329,7 +329,7 @@ describe('Компонент ParentDashboard', () => {
         if (table === 'users') {
           return {
             select: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockImplementation((field, value) => {
+            eq: vi.fn().mockImplementation(() => {
               if (field === 'id') {
                 return {
                   single: vi.fn().mockResolvedValue({
@@ -492,7 +492,7 @@ describe('Компонент ParentDashboard', () => {
         if (table === 'users') {
           return {
             select: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockImplementation((field, value) => {
+            eq: vi.fn().mockImplementation(() => {
               if (field === 'id') {
                 return {
                   single: vi.fn().mockResolvedValue({
@@ -517,7 +517,7 @@ describe('Компонент ParentDashboard', () => {
         if (table === 'tasks') {
           return {
             select: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockImplementation((field, value) => {
+            eq: vi.fn().mockImplementation(() => {
               if (field === 'family_id') {
                 return {
                   eq: vi.fn().mockReturnThis(),
@@ -655,7 +655,7 @@ describe('Компонент ParentDashboard', () => {
         if (table === 'users') {
           return {
             select: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockImplementation((field, value) => {
+            eq: vi.fn().mockImplementation(() => {
               if (field === 'id') {
                 return {
                   single: vi.fn().mockResolvedValue({
@@ -716,7 +716,7 @@ describe('Компонент ParentDashboard', () => {
         if (table === 'users') {
           return {
             select: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockImplementation((field, value) => {
+            eq: vi.fn().mockImplementation(() => {
               if (field === 'id') {
                 return {
                   single: vi.fn().mockResolvedValue({
@@ -811,7 +811,7 @@ describe('Компонент ParentDashboard', () => {
         if (table === 'users') {
           return {
             select: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockImplementation((field, value) => {
+            eq: vi.fn().mockImplementation(() => {
               if (field === 'id') {
                 return {
                   single: vi.fn().mockResolvedValue({

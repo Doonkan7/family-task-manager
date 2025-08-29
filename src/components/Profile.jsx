@@ -57,7 +57,7 @@ export default function Profile() {
 
     try {
       // Проверяем существование семьи
-      const { data: familyData, error: familyError } = await supabase
+      const { error: familyError } = await supabase
         .from('families')
         .select('family_id')
         .eq('family_id', newFamilyCode)

@@ -94,12 +94,12 @@ vi.mock('../lib/supabase', () => ({
 }))
 
 // Mock для URL.createObjectURL (используется для превью файлов)
-global.URL.createObjectURL = vi.fn(() => 'mocked-object-url')
-global.URL.revokeObjectURL = vi.fn()
+globalThis.URL.createObjectURL = vi.fn(() => 'mocked-object-url')
+globalThis.URL.revokeObjectURL = vi.fn()
 
 // Mock для window.alert и window.confirm
-global.alert = vi.fn()
-global.confirm = vi.fn(() => true)
+globalThis.alert = vi.fn()
+globalThis.confirm = vi.fn(() => true)
 
 // Mock для window.location.reload
 Object.defineProperty(window, 'location', {
@@ -110,7 +110,7 @@ Object.defineProperty(window, 'location', {
 })
 
 // Mock для console методов в тестах
-global.console = {
+globalThis.console = {
   ...console,
   error: vi.fn(),
   warn: vi.fn(),
@@ -118,14 +118,14 @@ global.console = {
 }
 
 // Настройка IntersectionObserver для тестов
-global.IntersectionObserver = vi.fn(() => ({
+globalThis.IntersectionObserver = vi.fn(() => ({
   observe: vi.fn(),
   disconnect: vi.fn(),
   unobserve: vi.fn()
 }))
 
 // Настройка ResizeObserver для тестов
-global.ResizeObserver = vi.fn(() => ({
+globalThis.ResizeObserver = vi.fn(() => ({
   observe: vi.fn(),
   disconnect: vi.fn(),
   unobserve: vi.fn()

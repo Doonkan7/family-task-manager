@@ -4,7 +4,7 @@
 
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { supabase, testConnection } from '../../lib/supabase'
-import { mockUser, mockChild, mockTask, mockFamily } from '../utils'
+import { mockUser, mockTask } from '../utils'
 
 describe('Supabase API Integration', () => {
   beforeEach(() => {
@@ -39,17 +39,17 @@ describe('Supabase API Integration', () => {
 
   describe('Аутентификация', () => {
     test('получает текущую сессию', async () => {
-      const { data, error } = await supabase.auth.getSession()
+      const { data: _data, error: _error } = await supabase.auth.getSession()
       
       expect(data).toBeDefined()
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
     })
 
     test('получает текущего пользователя', async () => {
-      const { data, error } = await supabase.auth.getUser()
+      const { data: _data, error: _error } = await supabase.auth.getUser()
       
       expect(data).toBeDefined()
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
     })
 
     test('выполняет вход с паролем', async () => {
@@ -61,7 +61,7 @@ describe('Supabase API Integration', () => {
       const { error } = await supabase.auth.signInWithPassword(credentials)
       
       // Mock должен обработать корректные данные
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
     })
 
     test('выполняет регистрацию', async () => {
@@ -70,16 +70,16 @@ describe('Supabase API Integration', () => {
         password: 'password123'
       }
 
-      const { data, error } = await supabase.auth.signUp(credentials)
+      const { data: _data, error: _error } = await supabase.auth.signUp(credentials)
       
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
       expect(data).toBeDefined()
     })
 
     test('выполняет выход', async () => {
       const { error } = await supabase.auth.signOut()
       
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
     })
 
     test('обновляет метаданные пользователя', async () => {
@@ -92,7 +92,7 @@ describe('Supabase API Integration', () => {
 
       const { error } = await supabase.auth.updateUser(updateData)
       
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
     })
 
     test('подписывается на изменения аутентификации', () => {
@@ -110,13 +110,13 @@ describe('Supabase API Integration', () => {
     test('выбирает пользователя по ID', async () => {
       const userId = 'test-user-id'
       
-      const { data, error } = await supabase
+      const { data: _data, error } = await supabase
         .from('users')
         .select('*')
         .eq('id', userId)
         .single()
       
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
       // В тестовой среде data может быть null если mock не настроен
     })
 
@@ -130,7 +130,7 @@ describe('Supabase API Integration', () => {
         .from('users')
         .insert([newUser])
       
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
     })
 
     test('обновляет пользователя', async () => {
@@ -145,32 +145,32 @@ describe('Supabase API Integration', () => {
         .update(updateData)
         .eq('id', userId)
       
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
     })
 
     test('получает пользователей семьи', async () => {
       const familyId = 'test-family-id'
       
-      const { data, error } = await supabase
+      const { data: _data, error: _error } = await supabase
         .from('users')
         .select('*')
         .eq('family_id', familyId)
       
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
       expect(Array.isArray(data)).toBe(true)
     })
 
     test('получает детей семьи', async () => {
       const familyId = 'test-family-id'
       
-      const { data, error } = await supabase
+      const { data: _data, error: _error } = await supabase
         .from('users')
         .select('id, email, phone, created_at')
         .eq('family_id', familyId)
         .eq('role', 'child')
         .order('created_at', { ascending: true })
       
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
       expect(Array.isArray(data)).toBe(true)
     })
   })
@@ -181,31 +181,31 @@ describe('Supabase API Integration', () => {
         family_name: 'Тестовая семья'
       }
 
-      const { data, error } = await supabase
+      const { data: _data, error: _error } = await supabase
         .from('families')
         .insert([familyData])
         .select('*')
         .single()
       
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
     })
 
     test('получает семью по ID', async () => {
       const familyId = 'test-family-id'
       
-      const { data, error } = await supabase
+      const { data: _data, error: _error } = await supabase
         .from('families')
         .select('*')
         .eq('family_id', familyId)
         .single()
       
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
     })
 
     test('проверяет существование семьи', async () => {
       const familyId = 'existing-family-id'
       
-      const { data, error } = await supabase
+      const { data: _data, error: _error } = await supabase
         .from('families')
         .select('family_id')
         .eq('family_id', familyId)
@@ -228,13 +228,13 @@ describe('Supabase API Integration', () => {
         .from('tasks')
         .insert([taskData])
       
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
     })
 
     test('получает задачи пользователя', async () => {
       const userId = 'test-user-id'
       
-      const { data, error } = await supabase
+      const { data: _data, error: _error } = await supabase
         .from('tasks')
         .select(`
           *,
@@ -244,7 +244,7 @@ describe('Supabase API Integration', () => {
         .eq('assigned_to_id', userId)
         .order('created_at', { ascending: false })
       
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
       expect(Array.isArray(data)).toBe(true)
     })
 
@@ -260,13 +260,13 @@ describe('Supabase API Integration', () => {
         .update(updateData)
         .eq('id', taskId)
       
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
     })
 
     test('получает задачи на проверке', async () => {
       const familyId = 'test-family-id'
       
-      const { data, error } = await supabase
+      const { data: _data, error: _error } = await supabase
         .from('tasks')
         .select(`
           *,
@@ -277,7 +277,7 @@ describe('Supabase API Integration', () => {
         .eq('status', 'completed')
         .order('completed_at', { ascending: false })
       
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
       expect(Array.isArray(data)).toBe(true)
     })
 
@@ -292,7 +292,7 @@ describe('Supabase API Integration', () => {
         })
         .eq('id', taskId)
       
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
     })
 
     test('отклоняет задачу с причиной', async () => {
@@ -307,7 +307,7 @@ describe('Supabase API Integration', () => {
         })
         .eq('id', taskId)
       
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
     })
 
     test('завершает задачу с фото-доказательством', async () => {
@@ -323,7 +323,7 @@ describe('Supabase API Integration', () => {
         })
         .eq('id', taskId)
       
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
     })
   })
 
@@ -337,19 +337,19 @@ describe('Supabase API Integration', () => {
         .from(bucket)
         .upload(filePath, file)
       
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
     })
 
     test('получает публичную ссылку на файл', () => {
       const bucket = 'task-proofs'
       const filePath = 'test/image.jpg'
 
-      const { data } = supabase.storage
+      const { data: _data } = supabase.storage
         .from(bucket)
         .getPublicUrl(filePath)
       
-      expect(data.publicUrl).toBeDefined()
-      expect(typeof data.publicUrl).toBe('string')
+      expect(_data.publicUrl).toBeDefined()
+      expect(typeof _data.publicUrl).toBe('string')
     })
 
     test('удаляет файл из storage', async () => {
@@ -420,7 +420,7 @@ describe('Supabase API Integration', () => {
     test('обрабатывает ошибки запросов к несуществующим записям', async () => {
       const nonExistentId = 'non-existent-id'
       
-      const { data, error } = await supabase
+      const { data: _data, error: _error } = await supabase
         .from('users')
         .select('*')
         .eq('id', nonExistentId)
@@ -472,7 +472,7 @@ describe('Supabase API Integration', () => {
     test('проверяет корректность UUID', async () => {
       const invalidUUID = 'not-a-uuid'
       
-      const { data, error } = await supabase
+      const { data: _data, error: _error } = await supabase
         .from('users')
         .select('*')
         .eq('id', invalidUUID)
@@ -500,13 +500,13 @@ describe('Supabase API Integration', () => {
 
     test('правильно использует индексы для поиска', async () => {
       // Запрос по индексированному полю должен быть быстрым
-      const { data, error } = await supabase
+      const { data: _data, error: _error } = await supabase
         .from('tasks')
         .select('*')
         .eq('assigned_to_id', 'test-user-id')
         .eq('status', 'pending')
       
-      expect(error).toBeNull()
+      expect(_error).toBeNull()
     })
   })
 })

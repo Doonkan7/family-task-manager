@@ -13,7 +13,7 @@ import { vi } from 'vitest'
  * @returns {Object} Результат рендеринга с дополнительными утилитами
  */
 export function renderWithProviders(ui, {
-  initialEntries = ['/'],
+  // initialEntries = ['/'], // временно не используется
   ...renderOptions
 } = {}) {
   const Wrapper = ({ children }) => {
@@ -337,5 +337,6 @@ export function createLocalStorageMock() {
 }
 
 // Экспорт всех утилит для удобства
+// eslint-disable-next-line react-refresh/only-export-components
 export * from '@testing-library/react'
 export { default as userEvent } from '@testing-library/user-event'

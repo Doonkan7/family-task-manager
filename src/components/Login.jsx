@@ -11,7 +11,7 @@ export default function Login() {
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState('parent');
   const [isLogin, setIsLogin] = useState(true);
-  const [isParent, setIsParent] = useState(true);
+  const [, setIsParent] = useState(true);
   const [familyCode, setFamilyCode] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -40,7 +40,7 @@ export default function Login() {
       } else {
         // Регистрация
         // 1) Сначала регистрируем пользователя в Auth БЕЗ дополнительных данных (чтобы избежать DB errors от триггеров/RLS)
-        const { data: authData, error: authError } = await supabase.auth.signUp({
+        const { error: authError } = await supabase.auth.signUp({
           email,
           password,
         })

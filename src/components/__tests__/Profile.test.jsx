@@ -3,7 +3,7 @@
  */
 
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
-import { screen, fireEvent, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { renderWithProviders, createSupabaseMock, mockUser, mockFamily } from '../../test/utils'
 import Profile from '../Profile'
@@ -75,7 +75,7 @@ describe('Компонент Profile', () => {
         if (table === 'users') {
           return {
             select: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockImplementation((field, value) => {
+            eq: vi.fn().mockImplementation(() => {
               if (field === 'id') {
                 return {
                   single: vi.fn().mockResolvedValue({
@@ -314,7 +314,7 @@ describe('Компонент Profile', () => {
       await user.click(joinButton)
       
       // Должно показать alert о необходимости ввести код
-      expect(global.alert).toHaveBeenCalledWith('Введите код семьи')
+      expect(globalThis.alert).toHaveBeenCalledWith('Введите код семьи')
     })
   })
 
@@ -331,7 +331,7 @@ describe('Компонент Profile', () => {
         if (table === 'users') {
           return {
             select: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockImplementation((field, value) => {
+            eq: vi.fn().mockImplementation(() => {
               if (field === 'id') {
                 return {
                   single: vi.fn().mockResolvedValue({
@@ -376,7 +376,7 @@ describe('Компонент Profile', () => {
     })
 
     test('покидает семью с подтверждением', async () => {
-      global.confirm.mockReturnValue(true)
+      globalThis.confirm.mockReturnValue(true)
       
       renderWithProviders(<Profile />)
       
@@ -387,7 +387,7 @@ describe('Компонент Profile', () => {
       const leaveButton = screen.getByRole('button', { name: /покинуть семью и создать новую/i })
       await user.click(leaveButton)
       
-      expect(global.confirm).toHaveBeenCalledWith(
+      expect(globalThis.confirm).toHaveBeenCalledWith(
         'Вы уверены, что хотите покинуть семью? Это создаст новую семью для вас.'
       )
       
@@ -398,7 +398,7 @@ describe('Компонент Profile', () => {
     })
 
     test('отменяет выход из семьи', async () => {
-      global.confirm.mockReturnValue(false)
+      globalThis.confirm.mockReturnValue(false)
       
       renderWithProviders(<Profile />)
       
@@ -409,7 +409,7 @@ describe('Компонент Profile', () => {
       const leaveButton = screen.getByRole('button', { name: /покинуть семью и создать новую/i })
       await user.click(leaveButton)
       
-      expect(global.confirm).toHaveBeenCalled()
+      expect(globalThis.confirm).toHaveBeenCalled()
       
       const { supabase } = await import('../../lib/supabase')
       // Не должен вызывать создание новой семьи
@@ -417,7 +417,7 @@ describe('Компонент Profile', () => {
     })
 
     test('отключает кнопку во время выхода из семьи', async () => {
-      global.confirm.mockReturnValue(true)
+      globalThis.confirm.mockReturnValue(true)
       
       renderWithProviders(<Profile />)
       
@@ -480,7 +480,7 @@ describe('Компонент Profile', () => {
       await user.click(createFamilyButton)
       
       await waitFor(() => {
-        expect(global.alert).toHaveBeenCalledWith('Ошибка: Database error')
+        expect(globalThis.alert).toHaveBeenCalledWith('Ошибка: Database error')
       })
     })
 
@@ -531,7 +531,7 @@ describe('Компонент Profile', () => {
       await user.click(joinButton)
       
       await waitFor(() => {
-        expect(global.alert).toHaveBeenCalledWith('Ошибка: Family not found')
+        expect(globalThis.alert).toHaveBeenCalledWith('Ошибка: Family not found')
       })
     })
   })
