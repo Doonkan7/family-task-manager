@@ -7,12 +7,15 @@ import { supabase } from './lib/supabase'
 
 import Login from './components/Login'
 import Profile from './components/Profile'
+import Tasks from './components/Tasks'
+import ParentDashboard from './components/ParentDashboard'
 import Sky from './components/Sky'
 
 function App() {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [currentView, setCurrentView] = useState('tasks') // 'tasks', 'profile'
+  const [currentView, setCurrentView] = useState('tasks') // 'tasks', 'profile', 'parent'
+  const [userProfile, setUserProfile] = useState(null) // Профиль пользователя с ролью
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -25,10 +28,42 @@ function App() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
+      if (!session) {
+        setUserProfile(null) // Очищаем профиль при выходе
+      }
     })
 
     return () => subscription.unsubscribe()
   }, [])
+
+  // Получение профиля пользователя после установки сессии
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (!session?.user) {
+        setUserProfile(null)
+        return
+      }
+
+      try {
+        const { data: profile, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', session.user.id)
+          .single()
+
+        if (error) {
+          console.error('Ошибка загрузки профиля:', error)
+          return
+        }
+
+        setUserProfile(profile)
+      } catch (err) {
+        console.error('Ошибка при загрузке профиля:', err)
+      }
+    }
+
+    loadUserProfile()
+  }, [session])
 
   // После аутентификации гарантируем наличие базового профиля
   useEffect(() => {
@@ -102,10 +137,19 @@ function App() {
           }
 
           // Обновляем пользователя
-          await supabase
+          const { data: updatedProfile } = await supabase
             .from('users')
             .update({ family_id: targetFamilyId })
             .eq('id', user.id)
+            .select('*')
+            .single()
+          
+          if (updatedProfile) {
+            setUserProfile(updatedProfile)
+          }
+        } else if (profile) {
+          // Профиль уже существует, устанавливаем его
+          setUserProfile(profile)
         }
       } catch (e) {
         // Не ломаем UI; логируем ошибку для отладки
@@ -113,7 +157,9 @@ function App() {
       }
     }
 
-    ensureProfile()
+    if (session?.user) {
+      ensureProfile()
+    }
   }, [session])
 
   const handleLogout = async () => {
@@ -160,21 +206,33 @@ function App() {
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => setCurrentView('tasks')}
-                className={`px-3 py-1 rounded ${currentView === 'tasks' ? 'bg-minecraft-green text-white' : 'bg-gray-200'}`}
+                className={`px-3 py-1 rounded transition-colors ${currentView === 'tasks' ? 'bg-minecraft-green text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
               >
-                Задачи
+                {userProfile?.role === 'parent' ? '👶 Задачи детей' : '📋 Мои задачи'}
               </button>
+              
+              {/* Кнопка управления только для родителей */}
+              {userProfile?.role === 'parent' && (
+                <button
+                  onClick={() => setCurrentView('parent')}
+                  className={`px-3 py-1 rounded transition-colors ${currentView === 'parent' ? 'bg-minecraft-green text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
+                >
+                  👑 Управление
+                </button>
+              )}
+              
               <button
                 onClick={() => setCurrentView('profile')}
-                className={`px-3 py-1 rounded ${currentView === 'profile' ? 'bg-minecraft-green text-white' : 'bg-gray-200'}`}
+                className={`px-3 py-1 rounded transition-colors ${currentView === 'profile' ? 'bg-minecraft-green text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
               >
-                Профиль
+                👤 Профиль
               </button>
+              
               <button
                 onClick={handleLogout}
-                className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
               >
-                Выйти
+                🚪 Выйти
               </button>
             </div>
           </div>
@@ -182,12 +240,9 @@ function App() {
 
         <main className="max-w-6xl mx-auto px-4 py-6">
           {currentView === 'tasks' ? (
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-2xl font-pixel text-minecraft-green mb-6" style={{ fontFamily: '"Press Start 2P", "Courier New", monospace' }}>
-                Задачи
-              </h2>
-              <p>Здесь будет список задач...</p>
-            </div>
+            <Tasks />
+          ) : currentView === 'parent' ? (
+            <ParentDashboard />
           ) : (
             <Profile />
           )}
