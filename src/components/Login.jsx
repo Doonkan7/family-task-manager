@@ -163,8 +163,9 @@ export default function Login() {
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
+            <label htmlFor="email-input" className="block text-sm font-medium mb-1">Email</label>
             <input
+              id="email-input"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -175,8 +176,9 @@ export default function Login() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium mb-1">Пароль</label>
+            <label htmlFor="password-input" className="block text-sm font-medium mb-1">Пароль</label>
             <input
+              id="password-input"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -189,8 +191,9 @@ export default function Login() {
           {!isLogin && (
             <>
               <div>
-                <label className="block text-sm font-medium mb-1">Телефон (опционально)</label>
+                <label htmlFor="phone-input" className="block text-sm font-medium mb-1">Телефон (опционально)</label>
                 <input
+                  id="phone-input"
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
@@ -200,8 +203,9 @@ export default function Login() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-1">Роль</label>
+                <label htmlFor="role-select" className="block text-sm font-medium mb-1">Роль</label>
                 <select
+                  id="role-select"
                   value={role}
                   onChange={(e) => {
                     setRole(e.target.value)
@@ -221,8 +225,9 @@ export default function Login() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-1">Код семьи (опционально)</label>
+                <label htmlFor="family-code-input" className="block text-sm font-medium mb-1">Код семьи (опционально)</label>
                 <input
+                  id="family-code-input"
                   type="text"
                   value={familyCode}
                   onChange={(e) => setFamilyCode(e.target.value)}

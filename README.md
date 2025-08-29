@@ -1,15 +1,32 @@
-# React + Vite
+# Family Task Manager
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React приложение для управления семейными задачами с использованием Supabase.
 
-Currently, two official plugins are available:
+## 🧪 ОБЯЗАТЕЛЬНОЕ ПРАВИЛО ТЕСТИРОВАНИЯ
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**⚠️ ВАЖНО**: Для всех новых этапов разработки и компонентов обязательно писание автотестов и тестирование по итогу завершения каждого этапа.
 
-## Expanding the ESLint configuration
+📋 [Подробные правила тестирования](./docs/TESTING_RULES.md)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Быстрый запуск тестов:
+```bash
+# Запуск всех тестов
+npm run test:all
+
+# Тесты с покрытием
+npm run test:coverage
+
+# E2E тесты
+npm run test:e2e
+```
+
+## 🚀 Технологии
+
+- **React + Vite** - фронтенд
+- **Supabase** - база данных и аутентификация
+- **TailwindCSS** - стилизация
+- **Vitest** - unit тестирование
+- **Playwright** - E2E тестирование
 
 ---
 
